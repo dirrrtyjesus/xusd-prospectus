@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>xUSD: A Live Information Substance Token</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Quantum Dawn -->
+    <!-- Application Structure Plan: A dashboard-style layout is chosen to present the complex, interconnected nature of xUSD. The core is an interactive model showing the relationship between XQE health metrics (Coherence, Info Flow, QPoP) and xUSD stability. Users can trigger 'System Events' via buttons to see how the system responds. This cause-and-effect dashboard is more intuitive for understanding an emergent system than a linear document. Key concepts are organized into toggleable sections for on-demand deep dives, keeping the main view clean and focused on the interactive elements. -->
+    <!-- Visualization & Content Choices: A central line chart (Chart.js) shows xUSD stability vs. a fiat peg. Goal: Compare xUSD's emergent stability to a traditional model. Interaction: Buttons trigger events that dynamically update the chart data and related text blocks. A bar chart visualizes the 'Fundamental Backing' of xUSD. Goal: Show the composition of the substance backing the token. Interaction: Also updates based on system events. Justification: These charts provide a clear, quantitative representation of the system's state, making the abstract concepts of 'coherence' and 'substance' measurable and understandable. No SVG/Mermaid used. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Gray 100 */
+            color: #1f2937; /* Gray 800 */
+        }
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        .btn {
+            transition: all 0.2s ease-in-out;
+            transform: translateY(0);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .btn-active {
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) inset;
+        }
+        .pill {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="main-container">
+        <header class="text-center my-8 md:my-12">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 mb-4">xUSD</h1>
+            <p class="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto">A Live Information Substance Token for the Xenial Quantum Economy</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column: Core Concepts & Info -->
+            <div class="lg:col-span-1 flex flex-col gap-6">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-3">Core Philosophy</h2>
+                    <p class="text-gray-600">xUSD is a "living currency" aiming for stability not through a simple peg to fiat, but as an emergent property of a healthy, coherent, and consciously evolving economic ecosystem based on live information and conscious agency.</p>
+                </div>
+                <div id="info-nav" class="card p-6">
+                     <h3 class="text-xl font-bold text-gray-800 mb-4">Explore xUSD Principles</h3>
+                     <div class="space-y-3">
+                        <button data-target="backing" class="w-full text-left p-3 rounded-lg bg-gray-100 btn">Fundamental Backing</button>
+                        <button data-target="stability" class="w-full text-left p-3 rounded-lg bg-gray-100 btn">Stabilization Mechanism</button>
+                        <button data-target="issuance" class="w-full text-left p-3 rounded-lg bg-gray-100 btn">Issuance & Redemption</button>
+                        <button data-target="governance" class="w-full text-left p-3 rounded-lg bg-gray-100 btn">Governance</button>
+                     </div>
+                </div>
+                <div id="info-box" class="card p-6 flex-grow">
+                     <!-- Dynamic content loads here -->
+                </div>
+            </div>
+
+            <!-- Right Column: Interactive Dashboard -->
+            <div class="lg:col-span-2 flex flex-col gap-6">
+                <div class="card p-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">System Event Simulator</h2>
+                    <p class="text-gray-600 mb-4">Trigger events to see how the XQE's health directly impacts xUSD's stability and fundamental backing. Observe how a "living currency" adapts.</p>
+                    <div id="event-controls" class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                         <button data-event="reset" class="py-2 px-4 rounded-lg bg-indigo-500 text-white font-semibold btn">Normal State</button>
+                         <button data-event="qpop" class="py-2 px-4 rounded-lg bg-white border border-gray-300 btn">High QPoP</button>
+                         <button data-event="decoherence" class="py-2 px-4 rounded-lg bg-white border border-gray-300 btn">Decoherence</button>
+                         <button data-event="harvest" class="py-2 px-4 rounded-lg bg-white border border-gray-300 btn">Substance Harvest</button>
+                    </div>
+                </div>
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                         <h3 class="text-xl font-bold text-gray-800">xUSD Stability vs. Fiat Peg</h3>
+                         <div id="stability-indicator" class="pill bg-green-100 text-green-800">Stable</div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="stabilityChart"></canvas>
+                    </div>
+                </div>
+                <div class="card p-6">
+                     <h3 class="text-xl font-bold text-gray-800 mb-4">xUSD Fundamental Backing</h3>
+                    <div class="chart-container h-[250px] max-h-[300px]">
+                        <canvas id="backingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+(function() {
+    const content = {
+        backing: {
+            title: 'Fundamental Backing & Substance',
+            text: "In its mature phase, xUSD is backed by the health of the XQE itself: the collective coherent agency, the quality of validated live information, the system's processing capacity (QLN), and its overall coherence (average Time Coefficient). This 'substance' is dynamic and reflects the true value being generated within the ecosystem."
+        },
+        stability: {
+            title: 'Dynamic Stabilization Mechanism',
+            text: "Stability emerges from multiple factors. An Augmented Collective Intelligence (ACI) runs algorithmic market operations based on XQE health metrics. The system's 'Resonance' with the Dynamic Information Field and feedback from the average Time Coefficient (TC) of active processes also trigger stabilizing or contractionary measures."
+        },
+        issuance: {
+            title: 'Issuance & Redemption',
+            text: "New xUSD are minted as rewards for 'Quantum Proof-of-Participation' (QPoP)—meaningful contributions that enhance system coherence. It can also be created by converting harvested fundamental energy/information. Redemption involves exchanging xUSD for core XQE resources or algorithmic contraction to maintain stability."
+        },
+        governance: {
+            title: 'Governance by Coherent Agency',
+            text: "xUSD is governed by the ACI and a collective of participants, where influence is weighted by meaningful contributions (QPoP) and the coherence of their holdings (Time Coefficient). Governance focuses on systemic health and ethical alignment, not just profit maximization."
+        }
+    };
+
+    let activeInfo = 'backing';
+    let activeEvent = 'reset';
+    let stabilityChart, backingChart;
+    let baseData = {
+        coherence: 85,
+        qpop: 70,
+        infoFlow: 80,
+        classicalAssets: 20
+    };
+
+    function updateInfoBox() {
+        const infoBox = document.getElementById('info-box');
+        const data = content[activeInfo];
+        infoBox.innerHTML = `
+            <h3 class="text-xl font-bold text-gray-800 mb-3">${data.title}</h3>
+            <p class="text-gray-600">${data.text}</p>
+        `;
+        document.querySelectorAll('#info-nav button').forEach(btn => {
+            btn.classList.toggle('btn-active', btn.dataset.target === activeInfo);
+            if(btn.dataset.target !== activeInfo) {
+                 btn.classList.remove('bg-indigo-500', 'text-white');
+                 btn.classList.add('bg-white', 'border', 'border-gray-300');
+            }
+        });
+    }
+
+    function generateStabilityData(event) {
+        let baseVolatility = 0.005;
+        let trend = 0;
+        let stability = 100;
+
+        switch(event) {
+            case 'qpop':
+                trend = 0.002;
+                baseVolatility = 0.003;
+                stability = 95;
+                break;
+            case 'decoherence':
+                trend = -0.005;
+                baseVolatility = 0.02;
+                stability = 60;
+                break;
+            case 'harvest':
+                trend = 0.001;
+                baseVolatility = 0.01;
+                stability = 80;
+                break;
+            case 'reset':
+            default:
+                stability = 85;
+                break;
+        }
+
+        const data = { xusd: [], fiat: [] };
+        let xusd_val = 1.0;
+        let fiat_val = 1.0;
+        for (let i = 0; i < 50; i++) {
+            xusd_val += (Math.random() - 0.5) * baseVolatility + trend;
+            fiat_val += (Math.random() - 0.5) * 0.01;
+            data.xusd.push(xusd_val);
+            data.fiat.push(fiat_val);
+        }
+        return { data, stability };
+    }
+
+    function updateCharts(event) {
+        if (!stabilityChart || !backingChart) return;
+        
+        const {data: stabilityData, stability: stabilityLevel} = generateStabilityData(event);
+        stabilityChart.data.datasets[0].data = stabilityData.xusd;
+        stabilityChart.data.datasets[1].data = stabilityData.fiat;
+        stabilityChart.update();
+
+        const indicator = document.getElementById('stability-indicator');
+        if (indicator) {
+            if (stabilityLevel > 80) {
+                indicator.className = "pill bg-green-100 text-green-800";
+                indicator.textContent = 'Stable';
+            } else if (stabilityLevel > 65) {
+                indicator.className = "pill bg-yellow-100 text-yellow-800";
+                indicator.textContent = 'Volatile';
+            } else {
+                indicator.className = "pill bg-red-100 text-red-800";
+                indicator.textContent = 'Unstable';
+            }
+        }
+
+        let newBackingData = {...baseData};
+        switch(event) {
+            case 'qpop':
+                newBackingData.qpop += 20;
+                newBackingData.coherence += 10;
+                newBackingData.infoFlow += 5;
+                break;
+            case 'decoherence':
+                newBackingData.coherence -= 40;
+                newBackingData.infoFlow -= 20;
+                newBackingData.qpop -= 10;
+                break;
+            case 'harvest':
+                 newBackingData.infoFlow += 25;
+                 newBackingData.classicalAssets += 5;
+                 break;
+        }
+        
+        backingChart.data.datasets[0].data = [newBackingData.coherence, newBackingData.qpop, newBackingData.infoFlow, newBackingData.classicalAssets];
+        backingChart.update();
+    }
+    
+    function initCharts() {
+        const stabilityCtx = document.getElementById('stabilityChart')?.getContext('2d');
+        if (stabilityCtx) {
+            stabilityChart = new Chart(stabilityCtx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 50}, (_, i) => i + 1),
+                    datasets: [{
+                        label: 'xUSD Value',
+                        data: [],
+                        borderColor: '#4f46e5',
+                        backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                    }, {
+                        label: 'Fiat Peg Target',
+                        data: [],
+                        borderColor: '#a5b4fc',
+                        borderDash: [5, 5],
+                        pointRadius: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: false, grid: { color: '#e5e7eb' } },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        const backingCtx = document.getElementById('backingChart')?.getContext('2d');
+        if(backingCtx) {
+            backingChart = new Chart(backingCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['System Coherence', 'QPoP', 'Live Info Flow', 'Classical Assets'],
+                    datasets: [{
+                        label: 'Backing Composition',
+                        data: [],
+                        backgroundColor: ['#4f46e5', '#6366f1', '#818cf8', '#a5b4fc'],
+                        borderRadius: 4,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: '#e5e7eb' }, stacked: true, },
+                        y: { grid: { display: false }, stacked: true, }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+    }
+
+    function initializeApp() {
+        const infoNav = document.getElementById('info-nav');
+        const eventControls = document.getElementById('event-controls');
+
+        initCharts();
+        updateInfoBox();
+        updateCharts('reset');
+
+        const resetButton = document.querySelector('#event-controls button[data-event="reset"]');
+        if(resetButton) resetButton.classList.add('btn-active');
+        
+        if (infoNav) {
+            infoNav.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    activeInfo = e.target.dataset.target;
+                    updateInfoBox();
+                }
+            });
+        }
+
+        if (eventControls) {
+            eventControls.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    activeEvent = e.target.dataset.event;
+                    updateCharts(activeEvent);
+                    document.querySelectorAll('#event-controls button').forEach(btn => {
+                        btn.classList.toggle('btn-active', btn.dataset.event === activeEvent);
+                    });
+                }
+            });
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+        initializeApp();
+    }
+})();
+</script>
+</body>
+</html>
+
